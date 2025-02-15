@@ -1,0 +1,67 @@
+version: '3'
+
+output: 'prefixed'
+
+tasks:
+
+  code-format:
+    cmds:
+      - >
+        poetry run autoflake
+        --exclude '*.idea*'
+        --exclude '*.mypy_cache*'
+        --exclude '*venv*'
+        --exclude '*.alembic*'
+        --exclude '*/alembic/*'
+        --expand-star-imports
+        --in-place
+        --recursive
+        --remove-all-unused-imports
+        --remove-duplicate-keys
+        --remove-unused-variables
+        --verbose
+        .
+      - poetry run isort --skip-glob 'alembic/*' .
+      - poetry run black --exclude 'alembic/' .
+    desc: format code with black & isort
+    dir: "."
+
+  code-lint:
+    cmds:
+      - poetry run black --check --verbose --exclude 'alembic/' .
+      - poetry run isort --check-only --skip-glob 'alembic/*' .
+      - poetry run flake8 ./app/ --exclude alembic/
+    desc: sequentially applies linters
+
+  set-up:
+    cmds:
+      - poetry install
+    desc: install all necessary packages
+    dir: "."
+    run: once
+
+  db-migrate:
+    cmds:
+      - >
+        poetry run
+        alembic upgrade head
+    desc: migrate DB
+    dir: "."
+    run: once
+
+  start-server:
+    cmds:
+      - > 
+        poetry run 
+        uvicorn main:app --host 0.0.0.0 --port 8000
+    desc: start server
+    dir: "./app"
+    run: once
+
+  run-server-docker:
+    cmds:
+      - task: db-migrate
+      - task: start-server
+    desc: start server with migrations
+    dir: "."
+    run: once

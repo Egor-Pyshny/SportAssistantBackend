@@ -1,0 +1,39 @@
+name: ALICE - MVP
+
+on:
+  push:
+  workflow_dispatch:
+
+
+jobs:
+
+  linters:
+    name:  Start linters.
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.value }}
+
+    steps:
+      - name: Code is pulled from repo.
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.11.5
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11.5
+
+      - name: Task is installed
+        run: |
+          echo "${GITHUB_WORKSPACE}/.github/bin" >> ${GITHUB_PATH}
+          chmod +x .github/bin/task
+
+      - name: Install env
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+          poetry install --no-interaction --no-root
+        working-directory: ./backend
+
+      - name: Start linters.
+        run: task code-lint
+        working-directory: ./backend

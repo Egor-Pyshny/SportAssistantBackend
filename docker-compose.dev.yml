@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: takumi
+    volumes:
+      - ./app:/backend/app
+      - ./scripts/start.sh:/start.sh
+      - ./alembic:/backend/alembic
+      - ./alembic.ini:/backend/alembic.ini
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    command: 
+      - /bin/sh
+      - -c
+      - |
+        chmod +x /start.sh && /start.sh
+    depends_on: 
+      - db
+      - redis
+  db:
+    image: postgres:14.6-alpine
+    container_name: db
+    hostname: db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+  redis:
+    image:
+      redis
+    environment:
+      - REDIS_PASSWORD=redis
+      - REDIS_USER=redis
+    ports:
+      - 6379:6379
+    
+  celery_worker:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      container_name: celery_worker
+      command: >
+        sh -c "PYTHONPATH=/backend/app celery -A app.services.celery_app.task worker --loglevel=info"
+      depends_on:
+        - backend
+        - redis
+      env_file:
+        - .env
+      volumes:
+        - ./app:/backend/app
+      environment:
+        - PYTHONPATH=/backend/app
+
+volumes:
+  db-data:
