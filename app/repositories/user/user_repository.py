@@ -1,3 +1,5 @@
+from sqlalchemy.orm import subqueryload
+
 from models import User
 from pydantic import EmailStr
 from sqlalchemy import UUID, select, update
@@ -32,7 +34,7 @@ class UserRepository:
 
     # @async_transaction
     async def get_user_by_email(self, email: str | EmailStr) -> User | None:
-        query = select(User).where(User.email == email)
+        query = select(User).options(subqueryload(User.coach)).where(User.email == email)
         result = await self.db.execute(query)
         return result.scalars().first()
 

@@ -1,7 +1,6 @@
 from typing import List
 
 from pydantic import UUID4, BaseModel, Field
-from schemas.user.user_response_schema import UserResponseSchema
 
 
 class CoachSchema(BaseModel):
