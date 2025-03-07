@@ -26,3 +26,17 @@ class Urls(Enum):
     # user
     get_me = "/get_me"
     check_email = "/check_email"
+
+    # competition
+    competition_list = "/"
+    competition_detail = "/{competition_id}"
+    competition_days = "/{competition_id}/days"
+    competition_create = "/create"
+    competition_update = "/update/{competition_id}"
+    competition_patch = "/{competition_id}"
+    competition_delete = "/delete/{competition_id}"
+
+    # coach
+    coach_list = "/"
+    coach_detail = "/{coach_id}"
+    coach_create = "/create"

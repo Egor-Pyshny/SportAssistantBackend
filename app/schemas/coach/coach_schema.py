@@ -1,6 +1,4 @@
-from typing import List
-
-from pydantic import UUID4, BaseModel, Field
+from pydantic import UUID4, BaseModel
 
 
 class CoachSchema(BaseModel):

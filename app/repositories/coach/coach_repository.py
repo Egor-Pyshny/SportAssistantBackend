@@ -27,7 +27,7 @@ class CoachRepository:
     async def get_all(self) -> List[Coach]:
         query = select(Coach).options(subqueryload(Coach.users))
         result = await self.db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())
 
     async def update(self, coach_id: UUID, coach_data: Coach) -> Optional[Coach]:
         db_coach = await self.get(coach_id)

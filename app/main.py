@@ -1,4 +1,6 @@
 import uvicorn
+
+from admin import CompetitionAdmin
 from admin.coach_admin import CoachAdmin
 from admin.user_admin import UserAdmin
 from constants.prefixes import Prefixes
@@ -13,6 +15,7 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.params import Depends
 from routers.auth.auth_controller import auth_router
 from routers.coach.coach_controller import coach_router
+from routers.competition.competition_controller import competition_router
 from routers.user.user_controller import user_router
 from services.redis import RedisClient
 from slowapi.errors import RateLimitExceeded
@@ -25,6 +28,7 @@ app = FastAPI(debug=True)
 admin = Admin(app, async_engine)
 admin.add_view(UserAdmin)
 admin.add_view(CoachAdmin)
+admin.add_view(CompetitionAdmin)
 
 origins = [
     # "http://localhost:8000",
@@ -85,6 +89,9 @@ app.openapi = custom_openapi
 app.include_router(auth_router, prefix=Prefixes.auth.value, tags=Tags.auth.value)
 app.include_router(user_router, prefix=Prefixes.user.value, tags=Tags.user.value)
 app.include_router(coach_router, prefix=Prefixes.coach.value, tags=Tags.coach.value)
+app.include_router(
+    competition_router, prefix=Prefixes.competition.value, tags=Tags.competition.value
+)
 
 
 @app.get("/health_check", status_code=200)

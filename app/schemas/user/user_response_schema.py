@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from pydantic import UUID4, BaseModel, EmailStr
-
 from schemas.coach.coach_schema import CoachSchema
 
 

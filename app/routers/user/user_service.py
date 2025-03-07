@@ -1,14 +1,13 @@
-from pydantic import EmailStr
-from starlette import status
-
 from constants.prefixes import Prefixes
 from dependencies import async_get_db, get_redis_client
 from fastapi import Depends, HTTPException
+from pydantic import EmailStr
 from repositories.user.user_repository import UserRepository
 from schemas.auth.redis_session_data import RedisSessionData
 from schemas.user.user_response_schema import UserResponseSchema
 from services.redis import RedisClient
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 
 class UserService:

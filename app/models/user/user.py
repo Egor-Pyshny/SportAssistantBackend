@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 class User(Base, TimeStampableModel):
     __tablename__ = "tbl_user"
 
-    id = Column(UUID, primary_key=True, nullable=False, unique=True, default=uuid4())
+    id = Column(UUID, primary_key=True, nullable=False, unique=True, default=uuid4)
     email = Column(String(50), index=True, nullable=False, unique=True)
     password = Column(Text, nullable=False)
     name = Column(String(30), nullable=False)

@@ -51,11 +51,13 @@ class AuthService:
                 status_code=status.HTTP_403_FORBIDDEN,
             )
         session_id = generate_sid()
-        redis_data = RedisSessionData(email=user.email)
+        redis_data = RedisSessionData(
+            email=user.email,
+            id=user.id,
+        )
         self.redis_client.set(
             f"{Prefixes.redis_session_prefix.value}:{session_id}",
             redis_data.model_dump(mode="json"),
-            TTL.session_ttl.value,
         )
         return session_id
 
@@ -94,11 +96,13 @@ class AuthService:
         db_user = User(**user.model_dump())
         await self.user_repository.create_user(db_user)
         session_id = generate_sid()
-        redis_data = RedisSessionData(email=user.email)
+        redis_data = RedisSessionData(
+            email=user.email,
+            id=user.id,
+        )
         self.redis_client.set(
             f"{Prefixes.redis_session_prefix.value}:{session_id}",
             redis_data.model_dump(mode="json"),
-            TTL.session_ttl.value,
         )
         return session_id
 
@@ -129,11 +133,13 @@ class AuthService:
             await self.user_repository.create_user(user)
             self.redis_client.delete(f"{Prefixes.redis_email_code_prefix.value}:{request.email}")
             session_id = generate_sid()
-            redis_data = RedisSessionData(email=user_with_code.user.email)
+            redis_data = RedisSessionData(
+                email=user_with_code.user.email,
+                id=user_with_code.user.id,
+            )
             self.redis_client.set(
                 f"{Prefixes.redis_session_prefix.value}:{session_id}",
                 redis_data.model_dump(mode="json"),
-                TTL.session_ttl.value,
             )
             return session_id
         else:

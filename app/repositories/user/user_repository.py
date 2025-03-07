@@ -1,9 +1,8 @@
-from sqlalchemy.orm import subqueryload
-
 from models import User
 from pydantic import EmailStr
 from sqlalchemy import UUID, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import subqueryload
 
 
 class UserRepository:

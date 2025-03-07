@@ -2,9 +2,9 @@ from typing import Annotated
 
 from constants.urls import Urls
 from dependencies import authorized_only
-from fastapi import APIRouter, Response, Body
+from fastapi import APIRouter, Body, Response
 from fastapi.params import Depends
-from routers.reponse_schemas.user_responses import get_me_responses, check_email_responses
+from routers.reponse_schemas.user_responses import check_email_responses, get_me_responses
 from routers.user.user_service import UserService
 from schemas.user.user_check_email_request import CheckEmailRequest
 from schemas.user.user_response_schema import UserResponseSchema
@@ -24,9 +24,8 @@ async def get_me(
     res = await user_service.get_me(sid)
     return res
 
-@user_router.post(
-    path=Urls.check_email.value, responses=check_email_responses
-)
+
+@user_router.post(path=Urls.check_email.value, responses=check_email_responses)
 async def check_email(
     request: Annotated[CheckEmailRequest, Body()],
     user_service: UserService = Depends(UserService),

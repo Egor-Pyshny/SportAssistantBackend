@@ -15,7 +15,8 @@ class RedisClient:
         expire: Optional[int] = None,
     ) -> None:
         self.redis.hset(key, mapping=value)
-        self.redis.expire(key, expire)
+        if expire:
+            self.redis.expire(key, expire)
 
     def get(self, key: str | EmailStr) -> dict | None:
         value = self.redis.hgetall(key)

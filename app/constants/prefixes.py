@@ -8,6 +8,7 @@ class Prefixes(Enum):
     auth = f"{api_prefix}/auth"
     user = f"{api_prefix}/user"
     coach = f"{api_prefix}/coach"
+    competition = f"{api_prefix}/competition"
 
     redis_session_prefix = "sessions"
     redis_email_code_prefix = "email_verification"
