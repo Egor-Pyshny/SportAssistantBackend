@@ -17,4 +17,6 @@ class Competition(Base, TimeStampableModel):
     notes = Column(Text, nullable=False)
 
     user_id = Column(UUID, ForeignKey("tbl_user.id"), nullable=False)
-    days = relationship("CompetitionDay", back_populates="competition", cascade="all, delete-orphan")
+    days = relationship(
+        "CompetitionDay", back_populates="competition", cascade="all, delete-orphan"
+    )

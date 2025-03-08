@@ -8,7 +8,6 @@ from fastapi import Cookie, HTTPException, status
 from services.mail import MailSender, SMTPClient
 from services.redis import RedisClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from utils.sid_generator import generate_sid
 
 
 def get_redis_client() -> RedisClient:
@@ -28,6 +27,7 @@ def authorized_only(sid: Annotated[str | None, Cookie()] = None):
     # redis_client.delete(f"{Prefixes.redis_session_prefix.value}:{sid}")
     # return new_sid
     return sid
+
 
 def get_mail_sender_client() -> MailSender:
     return SMTPClient()

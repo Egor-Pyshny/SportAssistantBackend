@@ -1,14 +1,12 @@
 from datetime import date
 from typing import List
 
-from pydantic import UUID4
-
 from models import Competition, CompetitionDay
+from pydantic import UUID4
+from schemas.competition.competition_update_request import CompetitionUpdateRequest
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import subqueryload
-
-from schemas.competition.competition_update_request import CompetitionUpdateRequest
 
 
 class CompetitionRepository:
