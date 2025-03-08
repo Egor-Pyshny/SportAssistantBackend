@@ -1,9 +1,5 @@
-from asyncio import wait
 from datetime import date, timedelta
-from turtle import delay
 from typing import Any, Callable, Coroutine, List
-
-from platformdirs import user_data_dir
 
 from constants.prefixes import Prefixes
 from constants.status_enum import CompetitionStatus
@@ -19,6 +15,7 @@ from schemas.competition.competition_create_request import CompetitionCreateRequ
 from schemas.competition.competition_schema import CompetitionSchema
 from schemas.competition.competition_update_request import CompetitionUpdateRequest
 from schemas.competition_day.competition_day_schema import CompetitionDaySchema
+from schemas.competition_day.competition_day_update_request import CompetitionDayUpdateRequest
 from services.redis import RedisClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -38,16 +35,12 @@ class CompetitionService:
     async def create(self, data: CompetitionCreateRequest, sid: str):
         dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
         user = RedisSessionData(**dict)
-        competition = await self.competition_repository.create(Competition(**data.model_dump(), user_id=user.id))
+        competition = await self.competition_repository.create(
+            Competition(**data.model_dump(), user_id=user.id)
+        )
         dates = [
             data.start_date + timedelta(days=i)
             for i in range((data.end_date - data.start_date).days + 1)
-        ]
-        days = [
-            await self.competition_days_repository.create(
-                CompetitionDay(date=date, competition=competition, competition_id=competition.id)
-            )
-            for date in dates
         ]
 
     async def get_all(self, sid: str, current_date: date, status: CompetitionStatus):
@@ -98,3 +91,40 @@ class CompetitionService:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Competition not found"
             )
+
+    async def get_competition_day(self, competition_id: UUID4, day: date):
+        competition = await self.competition_repository.get(competition_id)
+        if not competition:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Competition not found"
+            )
+        competition_schema = CompetitionSchema.model_validate(competition)
+        day_model = await self.competition_days_repository.get_day(competition_id, day)
+        res = CompetitionDaySchema(
+            id=day_model.id if day_model else None,
+            date=day,
+            results=day_model.results if day_model else "",
+            notes=day_model.notes if day_model else "",
+            competition_name=competition_schema.name,
+            competition_location=competition_schema.location,
+            competition_end_date=competition_schema.end_date,
+            competition_start_date=competition_schema.start_date,
+        )
+        return res
+
+    async def update_competition_day(self, id: UUID4, body: CompetitionDayUpdateRequest):
+        if body.id:
+            day = await self.competition_days_repository.get_day(id, body.date)
+            if not day:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="Competition day not found"
+                )
+            new_day = await self.competition_days_repository.update(id, body)
+        else:
+            day_model = CompetitionDay()
+            day_model.competition_id = id
+            day_model.notes = body.notes
+            day_model.results = body.result
+            day_model.date = body.date
+            new_day = await self.competition_days_repository.create(day_model)
+        return new_day

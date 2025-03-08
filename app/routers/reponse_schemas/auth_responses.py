@@ -38,7 +38,7 @@ verification_responses = {
         },
     },
     400: {
-        "description": "Incorrect code or validation error",
+        "description": "Incorrect code",
         "content": {
             "application/json": {
                 "example": {"detail": {"message": "Verification code is expired"}}
@@ -85,18 +85,10 @@ forgot_password_responses = {
             }
         },
     },
-    400: {
-        "description": "Validation Error",
-        "content": {"application/json": {"example": {"detail": {"message": "Validation error"}}}},
-    },
 }
 reset_password_responses = {
     404: {
         "description": "User not found",
         "content": {"application/json": {"example": {"detail": {"message": "User not found"}}}},
-    },
-    400: {
-        "description": "Validation Error",
-        "content": {"application/json": {"example": {"detail": {"message": "Validation error"}}}},
     },
 }

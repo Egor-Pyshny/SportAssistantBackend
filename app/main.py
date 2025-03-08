@@ -1,5 +1,4 @@
 import uvicorn
-
 from admin import CompetitionAdmin
 from admin.coach_admin import CoachAdmin
 from admin.user_admin import UserAdmin
@@ -9,9 +8,6 @@ from database import async_engine
 from dependencies import authorized_only, get_redis_client
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, status
-from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
-from fastapi.openapi.utils import get_openapi
 from fastapi.params import Depends
 from routers.auth.auth_controller import auth_router
 from routers.coach.coach_controller import coach_router
@@ -45,15 +41,6 @@ app.add_middleware(
 )
 
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    concatenated_errors = "; ".join([error["msg"] for error in exc.errors()])
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content=jsonable_encoder({"detail": {"message": concatenated_errors}}),
-    )
-
-
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(
@@ -61,30 +48,6 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         content={"detail": {"message": "Too many requests, please try again later."}},
     )
 
-
-def custom_openapi():
-    if not app.openapi_schema:
-        app.openapi_schema = get_openapi(
-            title=app.title,
-            version=app.version,
-            openapi_version=app.openapi_version,
-            description=app.description,
-            terms_of_service=app.terms_of_service,
-            contact=app.contact,
-            license_info=app.license_info,
-            routes=app.routes,
-            tags=app.openapi_tags,
-            servers=app.servers,
-        )
-        for _, method_item in app.openapi_schema.get("paths").items():
-            for _, param in method_item.items():
-                responses = param.get("responses")
-                if "422" in responses:
-                    del responses["422"]
-    return app.openapi_schema
-
-
-app.openapi = custom_openapi
 
 app.include_router(auth_router, prefix=Prefixes.auth.value, tags=Tags.auth.value)
 app.include_router(user_router, prefix=Prefixes.user.value, tags=Tags.user.value)
