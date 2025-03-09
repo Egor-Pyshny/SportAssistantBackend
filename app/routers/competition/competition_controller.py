@@ -12,6 +12,7 @@ from schemas.competition.competition_schema import CompetitionSchema
 from schemas.competition.competition_update_request import CompetitionUpdateRequest
 from schemas.competition_day.competition_day_schema import CompetitionDaySchema
 from schemas.competition_day.competition_day_update_request import CompetitionDayUpdateRequest
+from schemas.competition_result.competition_result_update_request import CompetitionResultUpdateRequest
 
 competition_router = APIRouter()
 
@@ -106,3 +107,26 @@ async def update_competition_day(
 ):
     response.set_cookie("sid", sid, httponly=True)
     return await competition_service.update_competition_day(competition_id, body)
+
+
+@competition_router.get(path=Urls.competition_results.value)
+async def get_competition_result(
+    response: Response,
+    competition_id: Annotated[UUID4, Path()],
+    sid: str | None = Depends(authorized_only),
+    competition_service: CompetitionService = Depends(CompetitionService),
+):
+    response.set_cookie("sid", sid, httponly=True)
+    return await competition_service.get_competition_result(competition_id)
+
+
+@competition_router.post(path=Urls.competition_update_result.value)
+async def update_competition_result(
+    response: Response,
+    competition_id: Annotated[UUID4, Path()],
+    body: Annotated[CompetitionResultUpdateRequest, Body()],
+    sid: str | None = Depends(authorized_only),
+    competition_service: CompetitionService = Depends(CompetitionService),
+):
+    response.set_cookie("sid", sid, httponly=True)
+    return await competition_service.update_competition_result(competition_id, body)

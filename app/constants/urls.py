@@ -36,7 +36,9 @@ class Urls(Enum):
     competition_patch = "/{competition_id}"
     competition_delete = "/delete/{competition_id}"
     competition_day = "/{competition_id}/days/{day}"
+    competition_results = "/result/{competition_id}"
     competition_update_day = "/update_day/{competition_id}"
+    competition_update_result = "/update_result/{competition_id}"
 
     # coach
     coach_list = "/"

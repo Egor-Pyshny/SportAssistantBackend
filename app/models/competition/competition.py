@@ -20,3 +20,6 @@ class Competition(Base, TimeStampableModel):
     days = relationship(
         "CompetitionDay", back_populates="competition", cascade="all, delete-orphan"
     )
+    result = relationship(
+        "CompetitionResult", back_populates="competition", cascade="all, delete-orphan"
+    )

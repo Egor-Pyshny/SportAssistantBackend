@@ -3,9 +3,8 @@ from datetime import date
 from pydantic import UUID4, BaseModel
 
 
-class CompetitionDaySchema(BaseModel):
+class CompetitionResultSchema(BaseModel):
     id: UUID4 | None
-    date: date
     results: str
     notes: str
 

@@ -6,16 +6,19 @@ from constants.status_enum import CompetitionStatus
 from dependencies import async_get_db, get_redis_client
 from fastapi import HTTPException
 from fastapi.params import Depends
-from models import Competition, CompetitionDay
+from models import Competition, CompetitionDay, CompetitionResult
 from pydantic import UUID4
 from repositories.competition.competition_repository import CompetitionRepository
 from repositories.competition_days.competition_days_repository import CompetitionDaysRepository
+from repositories.competition_result.competition_result_repository import CompetitionResultRepository
 from schemas.auth.redis_session_data import RedisSessionData
 from schemas.competition.competition_create_request import CompetitionCreateRequest
 from schemas.competition.competition_schema import CompetitionSchema
 from schemas.competition.competition_update_request import CompetitionUpdateRequest
 from schemas.competition_day.competition_day_schema import CompetitionDaySchema
 from schemas.competition_day.competition_day_update_request import CompetitionDayUpdateRequest
+from schemas.competition_result.competition_result_schema import CompetitionResultSchema
+from schemas.competition_result.competition_result_update_request import CompetitionResultUpdateRequest
 from services.redis import RedisClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -30,6 +33,7 @@ class CompetitionService:
     ):
         self.competition_repository: CompetitionRepository = CompetitionRepository(db)
         self.competition_days_repository: CompetitionDaysRepository = CompetitionDaysRepository(db)
+        self.competition_result_repository: CompetitionResultRepository = CompetitionResultRepository(db)
         self.redis_client: RedisClient = redis_client
 
     async def create(self, data: CompetitionCreateRequest, sid: str):
@@ -38,10 +42,10 @@ class CompetitionService:
         competition = await self.competition_repository.create(
             Competition(**data.model_dump(), user_id=user.id)
         )
-        dates = [
-            data.start_date + timedelta(days=i)
-            for i in range((data.end_date - data.start_date).days + 1)
-        ]
+        result = CompetitionResult()
+        result.competition_id = competition.id
+        result.competition = competition
+        await self.competition_result_repository.create(result)
 
     async def get_all(self, sid: str, current_date: date, status: CompetitionStatus):
         dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
@@ -93,22 +97,12 @@ class CompetitionService:
             )
 
     async def get_competition_day(self, competition_id: UUID4, day: date):
-        competition = await self.competition_repository.get(competition_id)
-        if not competition:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Competition not found"
-            )
-        competition_schema = CompetitionSchema.model_validate(competition)
         day_model = await self.competition_days_repository.get_day(competition_id, day)
         res = CompetitionDaySchema(
             id=day_model.id if day_model else None,
             date=day,
             results=day_model.results if day_model else "",
             notes=day_model.notes if day_model else "",
-            competition_name=competition_schema.name,
-            competition_location=competition_schema.location,
-            competition_end_date=competition_schema.end_date,
-            competition_start_date=competition_schema.start_date,
         )
         return res
 
@@ -128,3 +122,19 @@ class CompetitionService:
             day_model.date = body.date
             new_day = await self.competition_days_repository.create(day_model)
         return new_day
+
+    async def get_competition_result(self, competition_id: UUID4):
+        result = await self.competition_result_repository.get(competition_id)
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Competition not found"
+            )
+        return CompetitionResultSchema.model_validate(result)
+
+    async def update_competition_result(self, competition_id: UUID4, body: CompetitionResultUpdateRequest):
+        result = await self.competition_result_repository.update(competition_id, body)
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Competition not found"
+            )
+        return CompetitionResultSchema.model_validate(result)
