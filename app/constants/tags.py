@@ -9,3 +9,4 @@ class Tags(Enum):
     camps = ["camps"]
     ofp = ["ofp_results"]
     sfp = ["sfp_results"]
+    ant_params = ["anthropometric_params"]

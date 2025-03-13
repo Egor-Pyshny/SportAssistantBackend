@@ -12,7 +12,7 @@ from schemas.general.category_schema import CategorySchema
 from schemas.ofp_results.ofp_result_create_request import OFPResultCreateRequest
 from schemas.ofp_results.ofp_result_schema import OFPResultSchema
 from schemas.ofp_results.ofp_result_update_request import OFPResultUpdateRequest
-from schemas.ofp_results.ofp_results_view import OFPResultModelSchema
+from schemas.ofp_results.ofp_results_view import OFPResultViewSchema
 from services.redis import RedisClient
 
 
@@ -43,7 +43,7 @@ class OFPResultsService:
         user = RedisSessionData(**dict)
         results = await self.ofp_results_repository.get_all(user.id)
         results_schema = [
-            OFPResultModelSchema.model_validate(result) for result in results
+            OFPResultViewSchema.model_validate(result) for result in results
         ]
         return results_schema
 
@@ -62,7 +62,7 @@ class OFPResultsService:
             )
         return OFPResultSchema.model_validate(new_result)
 
-    async def get(self, ofp_id):
+    async def get(self, ofp_id: UUID4):
         res = await self.ofp_results_repository.get(ofp_id)
         if res is None:
             raise HTTPException(

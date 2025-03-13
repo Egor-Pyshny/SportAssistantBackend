@@ -11,6 +11,8 @@ from dependencies import authorized_only, get_redis_client
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, status
 from fastapi.params import Depends
+
+from routers.ant_params.ant_params_controller import ant_params_router
 from routers.auth.auth_controller import auth_router
 from routers.coach.coach_controller import coach_router
 from routers.competition.competition_controller import competition_router
@@ -70,6 +72,9 @@ app.include_router(
 )
 app.include_router(
     sfp_results_router, prefix=Prefixes.sfp_results.value, tags=Tags.sfp.value
+)
+app.include_router(
+    ant_params_router, prefix=Prefixes.ant_params.value, tags=Tags.ant_params.value
 )
 
 

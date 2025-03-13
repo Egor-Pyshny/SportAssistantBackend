@@ -10,7 +10,7 @@ from schemas.general.category_schema import CategorySchema
 from schemas.sfp_results.sfp_result_create_request import SFPResultCreateRequest
 from schemas.sfp_results.sfp_result_schema import SFPResultSchema
 from schemas.sfp_results.sfp_result_update_request import SFPResultUpdateRequest
-from schemas.sfp_results.sfp_results_view import SFPResultModelSchema
+from schemas.sfp_results.sfp_results_view import SFPResultViewSchema
 
 sfp_results_router = APIRouter()
 
@@ -36,7 +36,7 @@ async def create_sfp_result(
     await sfp_results_service.create(body, sid)
 
 
-@sfp_results_router.get(path=Urls.sfp_list.value, response_model=List[SFPResultModelSchema])
+@sfp_results_router.get(path=Urls.sfp_list.value, response_model=List[SFPResultViewSchema])
 async def get_all(
     response: Response,
     sid: str | None = Depends(authorized_only),

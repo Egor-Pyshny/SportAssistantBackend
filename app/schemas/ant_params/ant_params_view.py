@@ -3,7 +3,7 @@ from datetime import date
 from pydantic import BaseModel, UUID4
 
 
-class OFPResultViewSchema(BaseModel):
+class AnthropometricParamsView(BaseModel):
     id: UUID4
     date: date
 

@@ -12,7 +12,7 @@ from schemas.general.category_schema import CategorySchema
 from schemas.sfp_results.sfp_result_create_request import SFPResultCreateRequest
 from schemas.sfp_results.sfp_result_schema import SFPResultSchema
 from schemas.sfp_results.sfp_result_update_request import SFPResultUpdateRequest
-from schemas.sfp_results.sfp_results_view import SFPResultModelSchema
+from schemas.sfp_results.sfp_results_view import SFPResultViewSchema
 from services.redis import RedisClient
 
 
@@ -43,7 +43,7 @@ class SFPResultsService:
         user = RedisSessionData(**dict)
         results = await self.sfp_results_repository.get_all(user.id)
         results_schema = [
-            SFPResultModelSchema.model_validate(result) for result in results
+            SFPResultViewSchema.model_validate(result) for result in results
         ]
         return results_schema
 
@@ -62,7 +62,7 @@ class SFPResultsService:
             )
         return SFPResultSchema.model_validate(new_result)
 
-    async def get(self, sfp_id):
+    async def get(self, sfp_id: UUID4):
         res = await self.sfp_results_repository.get(sfp_id)
         if res is None:
             raise HTTPException(

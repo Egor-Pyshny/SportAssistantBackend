@@ -12,6 +12,7 @@ class Prefixes(Enum):
     camps = f"{api_prefix}/camps"
     ofp_results = f"{api_prefix}/ofp"
     sfp_results = f"{api_prefix}/sfp"
+    ant_params = f"{api_prefix}/anthropometric_params"
 
     redis_session_prefix = "sessions"
     redis_email_code_prefix = "email_verification"

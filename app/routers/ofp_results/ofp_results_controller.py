@@ -11,7 +11,7 @@ from schemas.general.category_schema import CategorySchema
 from schemas.ofp_results.ofp_result_create_request import OFPResultCreateRequest
 from schemas.ofp_results.ofp_result_schema import OFPResultSchema
 from schemas.ofp_results.ofp_result_update_request import OFPResultUpdateRequest
-from schemas.ofp_results.ofp_results_view import OFPResultModelSchema
+from schemas.ofp_results.ofp_results_view import OFPResultViewSchema
 
 ofp_results_router = APIRouter()
 
@@ -37,7 +37,7 @@ async def create_ofp_result(
     await ofp_results_service.create(body, sid)
 
 
-@ofp_results_router.get(path=Urls.ofp_list.value, response_model=List[OFPResultModelSchema])
+@ofp_results_router.get(path=Urls.ofp_list.value, response_model=List[OFPResultViewSchema])
 async def get_all(
     response: Response,
     sid: str | None = Depends(authorized_only),

@@ -58,6 +58,14 @@ class Urls(Enum):
     sfp_delete = "/delete/{sfp_id}"
     sfp_get_graphic_data = "/graphic_data"
 
+    # ant_params
+    ant_params_detail = "/{params_id}"
+    ant_params_create = "/create"
+    ant_params_list = "/"
+    ant_params_update = "/update/{params_id}"
+    ant_params_delete = "/delete/{params_id}"
+    ant_params_get_graphic_data = "/graphic_data"
+
     # coach
     coach_list = "/"
     coach_detail = "/{coach_id}"
