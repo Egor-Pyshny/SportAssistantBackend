@@ -8,3 +8,4 @@ class Tags(Enum):
     competition = ["competition"]
     camps = ["camps"]
     ofp = ["ofp_results"]
+    sfp = ["sfp_results"]

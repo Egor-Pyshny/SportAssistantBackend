@@ -1,7 +1,7 @@
 from pydantic import BaseModel, UUID4
 
 
-class OFPCategorySchema(BaseModel):
+class CategorySchema(BaseModel):
     id: UUID4
     name: str
 

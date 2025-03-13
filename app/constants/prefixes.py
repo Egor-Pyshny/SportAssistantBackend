@@ -11,6 +11,7 @@ class Prefixes(Enum):
     competition = f"{api_prefix}/competition"
     camps = f"{api_prefix}/camps"
     ofp_results = f"{api_prefix}/ofp"
+    sfp_results = f"{api_prefix}/sfp"
 
     redis_session_prefix = "sessions"
     redis_email_code_prefix = "email_verification"

@@ -49,6 +49,15 @@ class Urls(Enum):
     ofp_delete = "/delete/{ofp_id}"
     ofp_get_graphic_data = "/graphic_data"
 
+    # sfp_results
+    sfp_all_categories = "/categories"
+    sfp_detail = "/{sfp_id}"
+    sfp_create = "/create"
+    sfp_list = "/"
+    sfp_update = "/update/{sfp_id}"
+    sfp_delete = "/delete/{sfp_id}"
+    sfp_get_graphic_data = "/graphic_data"
+
     # coach
     coach_list = "/"
     coach_detail = "/{coach_id}"

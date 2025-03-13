@@ -7,7 +7,7 @@ from constants.urls import Urls
 from dependencies import authorized_only
 from models import OFPResults
 from routers.ofp_results.ofp_results_service import OFPResultsService
-from schemas.ofp_results.ofp_categories_schema import OFPCategorySchema
+from schemas.general.category_schema import CategorySchema
 from schemas.ofp_results.ofp_result_create_request import OFPResultCreateRequest
 from schemas.ofp_results.ofp_result_schema import OFPResultSchema
 from schemas.ofp_results.ofp_result_update_request import OFPResultUpdateRequest
@@ -16,7 +16,7 @@ from schemas.ofp_results.ofp_results_view import OFPResultModelSchema
 ofp_results_router = APIRouter()
 
 
-@ofp_results_router.get(path=Urls.ofp_all_categories.value, response_model=List[OFPCategorySchema])
+@ofp_results_router.get(path=Urls.ofp_all_categories.value, response_model=List[CategorySchema])
 async def get_all_categories(
     response: Response,
     sid: str | None = Depends(authorized_only),

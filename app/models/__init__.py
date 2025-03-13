@@ -10,3 +10,4 @@ from models.user.user import User  # noqa
 from models.training_camp.training_camp import TrainingCamp  # noqa
 from models.training_camp_day.training_camp_day import TrainingCampDay  # noqa
 from models.ofp_results.ofp_results import OFPCategory, OFPResults  # noqa
+from models.sfp_results.sfp_results import SFPCategory, SFPResults  # noqa

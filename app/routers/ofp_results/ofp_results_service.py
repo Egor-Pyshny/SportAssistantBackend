@@ -8,7 +8,7 @@ from dependencies import async_get_db, get_redis_client
 from models import OFPResults
 from repositories.ofp_results.ofp_results_repository import OFPResultsRepository
 from schemas.auth.redis_session_data import RedisSessionData
-from schemas.ofp_results.ofp_categories_schema import OFPCategorySchema
+from schemas.general.category_schema import CategorySchema
 from schemas.ofp_results.ofp_result_create_request import OFPResultCreateRequest
 from schemas.ofp_results.ofp_result_schema import OFPResultSchema
 from schemas.ofp_results.ofp_result_update_request import OFPResultUpdateRequest
@@ -28,7 +28,7 @@ class OFPResultsService:
 
     async def get_categories(self):
         categories = await self.ofp_results_repository.get_categories()
-        categories_schema = [OFPCategorySchema.model_validate(category) for category in categories]
+        categories_schema = [CategorySchema.model_validate(category) for category in categories]
         return categories_schema
 
     async def create(self, body: OFPResultCreateRequest, sid: str):
@@ -51,14 +51,14 @@ class OFPResultsService:
         res = await self.ofp_results_repository.delete(ofp_id)
         if not res:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Camp not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="OFPResult not found"
             )
 
     async def update(self, body: OFPResultUpdateRequest, ofp_id: UUID4):
         new_result = await self.ofp_results_repository.update(body, ofp_id)
         if new_result is None:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Camp not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="OFPResult not found"
             )
         return OFPResultSchema.model_validate(new_result)
 
@@ -66,7 +66,7 @@ class OFPResultsService:
         res = await self.ofp_results_repository.get(ofp_id)
         if res is None:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Camp not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="OFPResult not found"
             )
         schema = OFPResultSchema.model_validate(res)
         return schema

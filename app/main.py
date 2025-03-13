@@ -2,6 +2,7 @@ import uvicorn
 from admin import CompetitionAdmin
 from admin.coach_admin import CoachAdmin
 from admin.ofp_category_admin import OFPCategoryAdmin
+from admin.sfp_category_admin import SFPCategoryAdmin
 from admin.user_admin import UserAdmin
 from constants.prefixes import Prefixes
 from constants.tags import Tags
@@ -14,6 +15,7 @@ from routers.auth.auth_controller import auth_router
 from routers.coach.coach_controller import coach_router
 from routers.competition.competition_controller import competition_router
 from routers.ofp_results.ofp_results_controller import ofp_results_router
+from routers.sfp_results.sfp_results_controller import sfp_results_router
 from routers.training_camp.training_camp_controller import training_camp_router
 from routers.user.user_controller import user_router
 from services.redis import RedisClient
@@ -29,6 +31,7 @@ admin.add_view(UserAdmin)
 admin.add_view(CoachAdmin)
 admin.add_view(CompetitionAdmin)
 admin.add_view(OFPCategoryAdmin)
+admin.add_view(SFPCategoryAdmin)
 
 origins = [
     # "http://localhost:8000",
@@ -64,6 +67,9 @@ app.include_router(
 )
 app.include_router(
     ofp_results_router, prefix=Prefixes.ofp_results.value, tags=Tags.ofp.value
+)
+app.include_router(
+    sfp_results_router, prefix=Prefixes.sfp_results.value, tags=Tags.sfp.value
 )
 
 
