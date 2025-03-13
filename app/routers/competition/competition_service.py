@@ -15,6 +15,7 @@ from schemas.auth.redis_session_data import RedisSessionData
 from schemas.competition.competition_create_request import CompetitionCreateRequest
 from schemas.competition.competition_schema import CompetitionSchema
 from schemas.competition.competition_update_request import CompetitionUpdateRequest
+from schemas.competition.competition_view import CompetitionViewSchema
 from schemas.competition_day.competition_day_schema import CompetitionDaySchema
 from schemas.competition_day.competition_day_update_request import CompetitionDayUpdateRequest
 from schemas.competition_result.competition_result_schema import CompetitionResultSchema
@@ -53,7 +54,7 @@ class CompetitionService:
         callback = self.get_all_by_status(status)
         competitions = await callback(data.id, current_date)
         competitions_schemas = [
-            CompetitionSchema.model_validate(competition) for competition in competitions
+            CompetitionViewSchema.model_validate(competition) for competition in competitions
         ]
         return competitions_schemas
 
@@ -98,9 +99,14 @@ class CompetitionService:
 
     async def get_competition_day(self, competition_id: UUID4, day: date):
         day_model = await self.competition_days_repository.get_day(competition_id, day)
+        competition = await self.competition_repository.get(competition_id)
         res = CompetitionDaySchema(
             id=day_model.id if day_model else None,
             date=day,
+            competition_start_date=competition.start_date,
+            competition_end_date=competition.end_date,
+            competition_location=competition.location,
+            competition_name=competition.name,
             results=day_model.results if day_model else "",
             notes=day_model.notes if day_model else "",
         )

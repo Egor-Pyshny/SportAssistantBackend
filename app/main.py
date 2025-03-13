@@ -1,6 +1,7 @@
 import uvicorn
 from admin import CompetitionAdmin
 from admin.coach_admin import CoachAdmin
+from admin.ofp_category_admin import OFPCategoryAdmin
 from admin.user_admin import UserAdmin
 from constants.prefixes import Prefixes
 from constants.tags import Tags
@@ -12,6 +13,8 @@ from fastapi.params import Depends
 from routers.auth.auth_controller import auth_router
 from routers.coach.coach_controller import coach_router
 from routers.competition.competition_controller import competition_router
+from routers.ofp_results.ofp_results_controller import ofp_results_router
+from routers.training_camp.training_camp_controller import training_camp_router
 from routers.user.user_controller import user_router
 from services.redis import RedisClient
 from slowapi.errors import RateLimitExceeded
@@ -25,6 +28,7 @@ admin = Admin(app, async_engine)
 admin.add_view(UserAdmin)
 admin.add_view(CoachAdmin)
 admin.add_view(CompetitionAdmin)
+admin.add_view(OFPCategoryAdmin)
 
 origins = [
     # "http://localhost:8000",
@@ -54,6 +58,12 @@ app.include_router(user_router, prefix=Prefixes.user.value, tags=Tags.user.value
 app.include_router(coach_router, prefix=Prefixes.coach.value, tags=Tags.coach.value)
 app.include_router(
     competition_router, prefix=Prefixes.competition.value, tags=Tags.competition.value
+)
+app.include_router(
+    training_camp_router, prefix=Prefixes.camps.value, tags=Tags.camps.value
+)
+app.include_router(
+    ofp_results_router, prefix=Prefixes.ofp_results.value, tags=Tags.ofp.value
 )
 
 

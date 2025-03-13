@@ -3,17 +3,6 @@ from enum import Enum
 
 class Urls(Enum):
 
-    # lead
-    lead_list = "/"
-    lead_detail = "/{lead_id}"
-    lead_create = "/create"
-    lead_update = "/update/{lead_id}"
-    lead_patch = "/{lead_id}"
-    lead_count_by_status = "/statuses"
-    lead_import = "/import"
-    delete = "/delete/{lead_id}"
-    generate_template = "/generate_message/{lead_id}"
-
     # auth
     login = "/login"
     logout = "/logout"
@@ -39,6 +28,26 @@ class Urls(Enum):
     competition_results = "/result/{competition_id}"
     competition_update_day = "/update_day/{competition_id}"
     competition_update_result = "/update_result/{competition_id}"
+
+    # camps
+    camps_list = "/"
+    camps_detail = "/{competition_id}"
+    camps_days = "/{competition_id}/days"
+    camps_create = "/create"
+    camps_update = "/update/{competition_id}"
+    camps_patch = "/{competition_id}"
+    camps_delete = "/delete/{competition_id}"
+    camps_day = "/{competition_id}/days/{day}"
+    camps_update_day = "/update_day/{competition_id}"
+
+    # ofp_results
+    ofp_all_categories = "/categories"
+    ofp_detail = "/{ofp_id}"
+    ofp_create = "/create"
+    ofp_list = "/"
+    ofp_update = "/update/{ofp_id}"
+    ofp_delete = "/delete/{ofp_id}"
+    ofp_get_graphic_data = "/graphic_data"
 
     # coach
     coach_list = "/"

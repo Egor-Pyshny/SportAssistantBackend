@@ -6,3 +6,5 @@ class Tags(Enum):
     user = ["user"]
     coach = ["coach"]
     competition = ["competition"]
+    camps = ["camps"]
+    ofp = ["ofp_results"]
