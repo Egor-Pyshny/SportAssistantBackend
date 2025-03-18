@@ -59,12 +59,33 @@ class Urls(Enum):
     sfp_get_graphic_data = "/graphic_data"
 
     # ant_params
-    ant_params_detail = "/{params_id}"
+    ant_params_detail = "/get/{params_id}"
     ant_params_create = "/create"
     ant_params_list = "/"
     ant_params_update = "/update/{params_id}"
     ant_params_delete = "/delete/{params_id}"
-    ant_params_get_graphic_data = "/graphic_data"
+    ant_params_get_graphic_data = "/graphic_data/"
+
+    # notes
+    note_detail = "/get/{note_id}"
+    note_create = "/create"
+    note_list = "/"
+    note_update = "/update/{note_id}"
+    note_delete = "/delete/{note_id}"
+
+    # comprehensive_examination
+    comprehensive_examination_detail = "/get/{exam_id}"
+    comprehensive_examination_create = "/create"
+    comprehensive_examination_list = "/"
+    comprehensive_examination_update = "/update/{exam_id}"
+    comprehensive_examination_delete = "/delete/{exam_id}"
+
+    # med_examination
+    med_examination_detail = "/get/{exam_id}"
+    med_examination_create = "/create"
+    med_examination_list = "/"
+    med_examination_update = "/update/{exam_id}"
+    med_examination_delete = "/delete/{exam_id}"
 
     # coach
     coach_list = "/"

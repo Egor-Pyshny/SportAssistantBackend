@@ -1,8 +1,10 @@
+from datetime import date
 from typing import List, Annotated
 
-from fastapi import APIRouter, Response, Depends, Body
+from fastapi import APIRouter, Response, Depends, Body, Query
 from pydantic import UUID4
 
+from constants.ant_params_category_enum import AnthropometricParamsMeasures
 from constants.urls import Urls
 from dependencies import authorized_only
 from routers.ant_params.ant_params_service import AnthropometricParamsService
@@ -10,6 +12,7 @@ from schemas.ant_params.ant_params_create_request import AnthropometricParamsCre
 from schemas.ant_params.ant_params_schema import AnthropometricParamsSchema
 from schemas.ant_params.ant_params_update_request import AnthropometricParamsUpdateRequest
 from schemas.ant_params.ant_params_view import AnthropometricParamsView
+from schemas.general.graphic_data import GraphicPoint
 
 ant_params_router = APIRouter()
 
@@ -67,3 +70,16 @@ async def update_ant_params_result(
 ):
     response.set_cookie("sid", sid, httponly=True)
     return await ant_params_service.update(body, params_id)
+
+
+@ant_params_router.get(path=Urls.ant_params_get_graphic_data.value, response_model=List[GraphicPoint])
+async def get_ant_params_graphic_data(
+    response: Response,
+    start_date: Annotated[date, Query()],
+    end_date: Annotated[date, Query()],
+    category: Annotated[AnthropometricParamsMeasures, Query()],
+    sid: str | None = Depends(authorized_only),
+    ant_params_service: AnthropometricParamsService = Depends(AnthropometricParamsService),
+):
+    response.set_cookie("sid", sid, httponly=True)
+    return await ant_params_service.get_graphic_data(start_date, end_date, category, sid)

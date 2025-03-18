@@ -1,7 +1,12 @@
+import datetime
+from datetime import date
+from typing import List
+
 from pydantic import UUID4
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from constants.ant_params_category_enum import AnthropometricParamsMeasures
 from models import AnthropometricParams
 from schemas.ant_params.ant_params_update_request import AnthropometricParamsUpdateRequest
 
@@ -51,3 +56,14 @@ class AnthropometricParamsRepository:
         query = select(AnthropometricParams).where(AnthropometricParams.id == params_id)
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
+
+    async def get_graphic_data(self, start_date: date, end_date: date, user_id: UUID4) -> List[AnthropometricParams]:
+        query = select(AnthropometricParams).where(
+            and_(
+                AnthropometricParams.user_id == user_id,
+                AnthropometricParams.date >= start_date,
+                AnthropometricParams.date <= end_date,
+            )
+        )
+        result = await self.db.execute(query)
+        return list(result.scalars().all())

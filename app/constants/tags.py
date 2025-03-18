@@ -10,3 +10,6 @@ class Tags(Enum):
     ofp = ["ofp_results"]
     sfp = ["sfp_results"]
     ant_params = ["anthropometric_params"]
+    notes = ["notes"]
+    med_examination = ["med_examination"]
+    comprehensive_examination = ["comprehensive_examination"]

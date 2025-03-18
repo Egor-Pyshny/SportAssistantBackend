@@ -12,3 +12,6 @@ from models.training_camp_day.training_camp_day import TrainingCampDay  # noqa
 from models.ofp_results.ofp_results import OFPCategory, OFPResults  # noqa
 from models.sfp_results.sfp_results import SFPCategory, SFPResults  # noqa
 from models.ant_params.ant_params import AnthropometricParams  # noqa
+from models.notes.note_model import Note  # noqa
+from models.med_examination.med_examination import MedExamination  # noqa
+from models.comprehensive_examination.comprehensive_examination import ComprehensiveExamination  # noqa
