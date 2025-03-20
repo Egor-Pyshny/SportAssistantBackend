@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import Depends, HTTPException
 from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,6 +11,7 @@ from models import SFPResults
 from repositories.sfp_results.sfp_results_repository import SFPResultsRepository
 from schemas.auth.redis_session_data import RedisSessionData
 from schemas.general.category_schema import CategorySchema
+from schemas.general.graphic_data import GraphicPoint
 from schemas.sfp_results.sfp_result_create_request import SFPResultCreateRequest
 from schemas.sfp_results.sfp_result_schema import SFPResultSchema
 from schemas.sfp_results.sfp_result_update_request import SFPResultUpdateRequest
@@ -70,3 +73,14 @@ class SFPResultsService:
             )
         schema = SFPResultSchema.model_validate(res)
         return schema
+
+    async def get_graphic_data(self, start_date: date, end_date: date, category_id: UUID4, sid: UUID4):
+        dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
+        user = RedisSessionData(**dict)
+        res = await self.sfp_results_repository.get_graphic_data(start_date, end_date, category_id, user.id)
+        graphic_points = [GraphicPoint(
+            value=result.result,
+            key=result.date,
+        ) for result in res]
+        return graphic_points
+

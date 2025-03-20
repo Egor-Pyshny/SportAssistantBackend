@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import Depends, HTTPException
 from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,6 +11,7 @@ from models import OFPResults
 from repositories.ofp_results.ofp_results_repository import OFPResultsRepository
 from schemas.auth.redis_session_data import RedisSessionData
 from schemas.general.category_schema import CategorySchema
+from schemas.general.graphic_data import GraphicPoint
 from schemas.ofp_results.ofp_result_create_request import OFPResultCreateRequest
 from schemas.ofp_results.ofp_result_schema import OFPResultSchema
 from schemas.ofp_results.ofp_result_update_request import OFPResultUpdateRequest
@@ -70,3 +73,14 @@ class OFPResultsService:
             )
         schema = OFPResultSchema.model_validate(res)
         return schema
+
+    async def get_graphic_data(self, start_date: date, end_date: date, category_id: UUID4, sid: UUID4):
+        dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
+        user = RedisSessionData(**dict)
+        res = await self.ofp_results_repository.get_graphic_data(start_date, end_date, category_id, user.id)
+        graphic_points = [GraphicPoint(
+            value=result.result,
+            key=result.date,
+        ) for result in res]
+        return graphic_points
+

@@ -42,21 +42,21 @@ class Urls(Enum):
 
     # ofp_results
     ofp_all_categories = "/categories"
-    ofp_detail = "/{ofp_id}"
+    ofp_detail = "/get/{ofp_id}"
     ofp_create = "/create"
     ofp_list = "/"
     ofp_update = "/update/{ofp_id}"
     ofp_delete = "/delete/{ofp_id}"
-    ofp_get_graphic_data = "/graphic_data"
+    ofp_get_graphic_data = "/graphic_data/"
 
     # sfp_results
     sfp_all_categories = "/categories"
-    sfp_detail = "/{sfp_id}"
+    sfp_detail = "/get/{sfp_id}"
     sfp_create = "/create"
     sfp_list = "/"
     sfp_update = "/update/{sfp_id}"
     sfp_delete = "/delete/{sfp_id}"
-    sfp_get_graphic_data = "/graphic_data"
+    sfp_get_graphic_data = "/graphic_data/"
 
     # ant_params
     ant_params_detail = "/get/{params_id}"

@@ -1,8 +1,8 @@
-import datetime
+from datetime import date
 from typing import List
 
 from pydantic import UUID4
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import subqueryload
 
@@ -62,3 +62,15 @@ class OFPResultsRepository:
         query = select(OFPResults).where(OFPResults.id == ofp_id)
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
+
+    async def get_graphic_data(self, start_date: date, end_date: date, category_id: UUID4, user_id: UUID4):
+        query = select(OFPResults).where(
+            and_(
+                OFPResults.user_id == user_id,
+                OFPResults.date >= start_date,
+                OFPResults.date <= end_date,
+                OFPResults.ofp_category_id == category_id
+            )
+        )
+        result = await self.db.execute(query)
+        return list(result.scalars().all())

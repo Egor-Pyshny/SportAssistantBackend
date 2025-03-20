@@ -1,12 +1,14 @@
+from datetime import date
 from typing import List, Annotated
 
-from fastapi import APIRouter, Response, Depends, Body
+from fastapi import APIRouter, Response, Depends, Body, Query
 from pydantic import UUID4
 
 from constants.urls import Urls
 from dependencies import authorized_only
 from routers.sfp_results.sfp_results_service import SFPResultsService
 from schemas.general.category_schema import CategorySchema
+from schemas.general.graphic_data import GraphicPoint
 from schemas.sfp_results.sfp_result_create_request import SFPResultCreateRequest
 from schemas.sfp_results.sfp_result_schema import SFPResultSchema
 from schemas.sfp_results.sfp_result_update_request import SFPResultUpdateRequest
@@ -78,3 +80,16 @@ async def update_sfp_result(
 ):
     response.set_cookie("sid", sid, httponly=True)
     return await sfp_results_service.update(body, sfp_id)
+
+
+@sfp_results_router.get(path=Urls.ofp_get_graphic_data.value, response_model=List[GraphicPoint])
+async def get_ofp_results_graphic_data(
+    response: Response,
+    start_date: Annotated[date, Query()],
+    end_date: Annotated[date, Query()],
+    category_id: Annotated[UUID4, Query()],
+    sid: str | None = Depends(authorized_only),
+    sfp_results_service: SFPResultsService = Depends(SFPResultsService),
+):
+    response.set_cookie("sid", sid, httponly=True)
+    return await sfp_results_service.get_graphic_data(start_date, end_date, category_id, sid)
