@@ -1,15 +1,12 @@
 from datetime import date
-from typing import Callable, Coroutine, Any, List
-
-from fastapi import Depends, HTTPException
-from pydantic import UUID4
-from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
+from typing import Any, Callable, Coroutine, List
 
 from constants.prefixes import Prefixes
 from constants.status_enum import CompetitionStatus
 from dependencies import async_get_db, get_redis_client
-from models import TrainingCampDay, TrainingCamp
+from fastapi import Depends, HTTPException
+from models import TrainingCamp, TrainingCampDay
+from pydantic import UUID4
 from repositories.training_camp.training_camp_repository import TrainingCampRepository
 from repositories.training_camp_days.training_camp_days_repository import TrainingCampDaysRepository
 from schemas.auth.redis_session_data import RedisSessionData
@@ -20,6 +17,8 @@ from schemas.training_camp.training_camp_view import TrainingCampViewSchema
 from schemas.training_camp_day.training_camp_day_schema import TrainingCampDaySchema
 from schemas.training_camp_day.training_camp_update_request import TrainingCampDayUpdateRequest
 from services.redis import RedisClient
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 
 class TrainingCampService:
@@ -32,22 +31,18 @@ class TrainingCampService:
         self.camp_repository: TrainingCampRepository = TrainingCampRepository(db)
         self.camp_days_repository: TrainingCampDaysRepository = TrainingCampDaysRepository(db)
         self.redis_client: RedisClient = redis_client
-        
+
     async def create(self, data: TrainingCampCreateRequest, sid: str):
         dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
         user = RedisSessionData(**dict)
-        camp = await self.camp_repository.create(
-            TrainingCamp(**data.model_dump(), user_id=user.id)
-        )
+        camp = await self.camp_repository.create(TrainingCamp(**data.model_dump(), user_id=user.id))
 
     async def get_all(self, sid: str, current_date: date, status: CompetitionStatus):
         dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
         data = RedisSessionData(**dict)
         callback = self.get_all_by_status(status)
         camps = await callback(data.id, current_date)
-        camps_schemas = [
-            TrainingCampSchema.model_validate(camp) for camp in camps
-        ]
+        camps_schemas = [TrainingCampSchema.model_validate(camp) for camp in camps]
         return camps_schemas
 
     async def get_all_days(self, id: UUID4):
@@ -58,9 +53,7 @@ class TrainingCampService:
     async def get_info(self, id: UUID4):
         camp = await self.camp_repository.get(id)
         if camp is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Camp not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Camp not found")
         return TrainingCampSchema.model_validate(camp)
 
     def get_all_by_status(
@@ -77,17 +70,13 @@ class TrainingCampService:
     async def update(self, id: UUID4, data: TrainingCampUpdateRequest):
         new_camp = await self.camp_repository.update(id, data)
         if new_camp is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Camp not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Camp not found")
         return TrainingCampSchema.model_validate(new_camp)
 
     async def delete(self, camp_id: UUID4):
         res = await self.camp_repository.delete(camp_id)
         if not res:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Camp not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Camp not found")
 
     async def get_camp_day(self, camp_id: UUID4, day: date):
         day_model = await self.camp_days_repository.get_day(camp_id, day)

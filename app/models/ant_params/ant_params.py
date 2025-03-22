@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from models import Base
 from models.general.timestampable_model import TimeStampableModel
-from sqlalchemy import UUID, Column, Date, ForeignKey, Float
+from sqlalchemy import UUID, Column, Date, Float, ForeignKey
 
 
 class AnthropometricParams(Base, TimeStampableModel):

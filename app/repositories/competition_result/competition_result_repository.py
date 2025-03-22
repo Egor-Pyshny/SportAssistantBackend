@@ -1,13 +1,10 @@
-import datetime
-from datetime import date
-
-from models import CompetitionDay, CompetitionResult
+from models import CompetitionResult
 from pydantic import UUID4
-from schemas.competition_day.competition_day_update_request import CompetitionDayUpdateRequest
-from sqlalchemy import and_, select
+from schemas.competition_result.competition_result_update_request import (
+    CompetitionResultUpdateRequest,
+)
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from schemas.competition_result.competition_result_update_request import CompetitionResultUpdateRequest
 
 
 class CompetitionResultRepository:

@@ -1,6 +1,4 @@
 import uvicorn
-from fastapi.exceptions import ValidationException
-
 from admin import CompetitionAdmin
 from admin.coach_admin import CoachAdmin
 from admin.ofp_category_admin import OFPCategoryAdmin
@@ -13,12 +11,13 @@ from dependencies import authorized_only, get_redis_client
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, status
 from fastapi.params import Depends
-
 from routers.ant_params.ant_params_controller import ant_params_router
 from routers.auth.auth_controller import auth_router
 from routers.coach.coach_controller import coach_router
 from routers.competition.competition_controller import competition_router
-from routers.comprehensive_examination.comprehensive_examination_controller import comprehensive_exams_router
+from routers.comprehensive_examination.comprehensive_examination_controller import (
+    comprehensive_exams_router,
+)
 from routers.med_examination.med_examination_controller import med_exams_router
 from routers.note.note_controller import notes_router
 from routers.ofp_results.ofp_results_controller import ofp_results_router
@@ -69,23 +68,15 @@ app.include_router(coach_router, prefix=Prefixes.coach.value, tags=Tags.coach.va
 app.include_router(
     competition_router, prefix=Prefixes.competition.value, tags=Tags.competition.value
 )
+app.include_router(training_camp_router, prefix=Prefixes.camps.value, tags=Tags.camps.value)
+app.include_router(ofp_results_router, prefix=Prefixes.ofp_results.value, tags=Tags.ofp.value)
+app.include_router(sfp_results_router, prefix=Prefixes.sfp_results.value, tags=Tags.sfp.value)
+app.include_router(ant_params_router, prefix=Prefixes.ant_params.value, tags=Tags.ant_params.value)
+app.include_router(notes_router, prefix=Prefixes.notes.value, tags=Tags.notes.value)
 app.include_router(
-    training_camp_router, prefix=Prefixes.camps.value, tags=Tags.camps.value
-)
-app.include_router(
-    ofp_results_router, prefix=Prefixes.ofp_results.value, tags=Tags.ofp.value
-)
-app.include_router(
-    sfp_results_router, prefix=Prefixes.sfp_results.value, tags=Tags.sfp.value
-)
-app.include_router(
-    ant_params_router, prefix=Prefixes.ant_params.value, tags=Tags.ant_params.value
-)
-app.include_router(
-    notes_router, prefix=Prefixes.notes.value, tags=Tags.notes.value
-)
-app.include_router(
-    comprehensive_exams_router, prefix=Prefixes.comprehensive_examination.value, tags=Tags.comprehensive_examination.value
+    comprehensive_exams_router,
+    prefix=Prefixes.comprehensive_examination.value,
+    tags=Tags.comprehensive_examination.value,
 )
 app.include_router(
     med_exams_router, prefix=Prefixes.med_examination.value, tags=Tags.med_examination.value

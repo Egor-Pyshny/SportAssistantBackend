@@ -1,16 +1,14 @@
-from typing import List, Annotated
-
-from fastapi import APIRouter, Response, Depends, Body
-from pydantic import UUID4
-from routers.note.note_service import NoteService
+from typing import Annotated, List
 
 from constants.urls import Urls
 from dependencies import authorized_only
+from fastapi import APIRouter, Body, Depends, Response
+from pydantic import UUID4
+from routers.note.note_service import NoteService
 from schemas.note.note_create_request import NoteCreateRequest
 from schemas.note.note_schema import NoteSchema
 from schemas.note.note_update_request import NoteUpdateRequest
 from schemas.note.note_view_schema import NoteViewSchema
-
 
 notes_router = APIRouter()
 

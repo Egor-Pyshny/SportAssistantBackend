@@ -1,15 +1,12 @@
 from datetime import date
 from typing import Callable, List
 
-from fastapi import Depends, HTTPException
-from pydantic import UUID4
-from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
-
 from constants.ant_params_category_enum import AnthropometricParamsMeasures
 from constants.prefixes import Prefixes
 from dependencies import async_get_db, get_redis_client
+from fastapi import Depends, HTTPException
 from models import AnthropometricParams
+from pydantic import UUID4
 from repositories.ant_params.anthropometric_params_repository import AnthropometricParamsRepository
 from schemas.ant_params.ant_params_create_request import AnthropometricParamsCreateRequest
 from schemas.ant_params.ant_params_schema import AnthropometricParamsSchema
@@ -18,6 +15,8 @@ from schemas.ant_params.ant_params_view import AnthropometricParamsView
 from schemas.auth.redis_session_data import RedisSessionData
 from schemas.general.graphic_data import GraphicPoint
 from services.redis import RedisClient
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 
 class AnthropometricParamsService:
@@ -27,7 +26,9 @@ class AnthropometricParamsService:
         db: AsyncSession = Depends(async_get_db),
         redis_client: RedisClient = Depends(get_redis_client),
     ):
-        self.ant_params_repository: AnthropometricParamsRepository = AnthropometricParamsRepository(db)
+        self.ant_params_repository: AnthropometricParamsRepository = AnthropometricParamsRepository(
+            db
+        )
         self.redis_client: RedisClient = redis_client
 
     async def create(self, body: AnthropometricParamsCreateRequest, sid: str):
@@ -41,9 +42,7 @@ class AnthropometricParamsService:
         dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
         user = RedisSessionData(**dict)
         results = await self.ant_params_repository.get_all(user.id)
-        results_schema = [
-            AnthropometricParamsView.model_validate(result) for result in results
-        ]
+        results_schema = [AnthropometricParamsView.model_validate(result) for result in results]
         return results_schema
 
     async def delete(self, params_id: UUID4):
@@ -70,7 +69,9 @@ class AnthropometricParamsService:
         schema = AnthropometricParamsSchema.model_validate(res)
         return schema
 
-    async def get_graphic_data(self, start_date: date, end_date: date, category: AnthropometricParamsMeasures, sid: UUID4):
+    async def get_graphic_data(
+        self, start_date: date, end_date: date, category: AnthropometricParamsMeasures, sid: UUID4
+    ):
         dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
         user = RedisSessionData(**dict)
         res = await self.ant_params_repository.get_graphic_data(start_date, end_date, user.id)
@@ -78,26 +79,31 @@ class AnthropometricParamsService:
         filtered_data = selector(res)
         return filtered_data
 
-    def get_selector(self, category: AnthropometricParamsMeasures) -> Callable[[List[AnthropometricParams]], List[GraphicPoint]]:
+    def get_selector(
+        self, category: AnthropometricParamsMeasures
+    ) -> Callable[[List[AnthropometricParams]], List[GraphicPoint]]:
         match category:
             case AnthropometricParamsMeasures.weight:
                 return lambda dataList: [
                     GraphicPoint(
                         key=param.date,
                         value=param.weight,
-                    ) for param in dataList
+                    )
+                    for param in dataList
                 ]
             case AnthropometricParamsMeasures.height:
                 return lambda dataList: [
                     GraphicPoint(
                         key=param.date,
                         value=param.height,
-                    ) for param in dataList
+                    )
+                    for param in dataList
                 ]
             case AnthropometricParamsMeasures.chestCircumference:
                 return lambda dataList: [
                     GraphicPoint(
                         key=param.date,
                         value=param.chestCircumference,
-                    ) for param in dataList
+                    )
+                    for param in dataList
                 ]

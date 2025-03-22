@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 from typing import Any, Callable, Coroutine, List
 
 from constants.prefixes import Prefixes
@@ -10,7 +10,9 @@ from models import Competition, CompetitionDay, CompetitionResult
 from pydantic import UUID4
 from repositories.competition.competition_repository import CompetitionRepository
 from repositories.competition_days.competition_days_repository import CompetitionDaysRepository
-from repositories.competition_result.competition_result_repository import CompetitionResultRepository
+from repositories.competition_result.competition_result_repository import (
+    CompetitionResultRepository,
+)
 from schemas.auth.redis_session_data import RedisSessionData
 from schemas.competition.competition_create_request import CompetitionCreateRequest
 from schemas.competition.competition_schema import CompetitionSchema
@@ -19,7 +21,9 @@ from schemas.competition.competition_view import CompetitionViewSchema
 from schemas.competition_day.competition_day_schema import CompetitionDaySchema
 from schemas.competition_day.competition_day_update_request import CompetitionDayUpdateRequest
 from schemas.competition_result.competition_result_schema import CompetitionResultSchema
-from schemas.competition_result.competition_result_update_request import CompetitionResultUpdateRequest
+from schemas.competition_result.competition_result_update_request import (
+    CompetitionResultUpdateRequest,
+)
 from services.redis import RedisClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -34,7 +38,9 @@ class CompetitionService:
     ):
         self.competition_repository: CompetitionRepository = CompetitionRepository(db)
         self.competition_days_repository: CompetitionDaysRepository = CompetitionDaysRepository(db)
-        self.competition_result_repository: CompetitionResultRepository = CompetitionResultRepository(db)
+        self.competition_result_repository: CompetitionResultRepository = (
+            CompetitionResultRepository(db)
+        )
         self.redis_client: RedisClient = redis_client
 
     async def create(self, data: CompetitionCreateRequest, sid: str):
@@ -130,14 +136,26 @@ class CompetitionService:
         return new_day
 
     async def get_competition_result(self, competition_id: UUID4):
-        result = await self.competition_result_repository.get(competition_id)
-        if not result:
+        competition = await self.competition_repository.get(competition_id)
+        if not competition:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Competition not found"
             )
-        return CompetitionResultSchema.model_validate(result)
+        result = await self.competition_result_repository.get(competition_id)
+        res = CompetitionResultSchema(
+            id=result.id if result else None,
+            competition_start_date=competition.start_date,
+            competition_end_date=competition.end_date,
+            competition_location=competition.location,
+            competition_name=competition.name,
+            results=result.results if result else "",
+            notes=result.notes if result else "",
+        )
+        return res
 
-    async def update_competition_result(self, competition_id: UUID4, body: CompetitionResultUpdateRequest):
+    async def update_competition_result(
+        self, competition_id: UUID4, body: CompetitionResultUpdateRequest
+    ):
         result = await self.competition_result_repository.update(competition_id, body)
         if not result:
             raise HTTPException(

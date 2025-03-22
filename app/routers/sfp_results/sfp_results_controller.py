@@ -1,11 +1,10 @@
 from datetime import date
-from typing import List, Annotated
-
-from fastapi import APIRouter, Response, Depends, Body, Query
-from pydantic import UUID4
+from typing import Annotated, List
 
 from constants.urls import Urls
 from dependencies import authorized_only
+from fastapi import APIRouter, Body, Depends, Query, Response
+from pydantic import UUID4
 from routers.sfp_results.sfp_results_service import SFPResultsService
 from schemas.general.category_schema import CategorySchema
 from schemas.general.graphic_data import GraphicPoint

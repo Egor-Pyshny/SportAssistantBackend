@@ -1,12 +1,10 @@
 from datetime import date
-from typing import List, Annotated
-
-from fastapi import APIRouter, Response, Depends, Body, Query
-from pydantic import UUID4
+from typing import Annotated, List
 
 from constants.urls import Urls
 from dependencies import authorized_only
-from models import OFPResults
+from fastapi import APIRouter, Body, Depends, Query, Response
+from pydantic import UUID4
 from routers.ofp_results.ofp_results_service import OFPResultsService
 from schemas.general.category_schema import CategorySchema
 from schemas.general.graphic_data import GraphicPoint
@@ -94,4 +92,3 @@ async def get_ofp_results_graphic_data(
 ):
     response.set_cookie("sid", sid, httponly=True)
     return await ofp_results_service.get_graphic_data(start_date, end_date, category_id, sid)
-

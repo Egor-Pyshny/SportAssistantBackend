@@ -1,9 +1,8 @@
+from models import MedExamination
 from pydantic import UUID4
+from schemas.med_examination.med_examination_update_schema import MedExaminationUpdateRequest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from models import MedExamination
-from schemas.med_examination.med_examination_update_schema import MedExaminationUpdateRequest
 
 
 class MedExaminationRepository:

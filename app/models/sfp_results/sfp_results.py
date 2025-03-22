@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from models import Base
 from models.general.timestampable_model import TimeStampableModel
-from sqlalchemy import UUID, Column, Date, ForeignKey, Text, Float
+from sqlalchemy import UUID, Column, Date, Float, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
 

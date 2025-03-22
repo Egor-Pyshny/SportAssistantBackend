@@ -1,10 +1,10 @@
+from models import ComprehensiveExamination
 from pydantic import UUID4
+from schemas.comprehensive_examination.comprehensive_examination_update_schema import (
+    ComprehensiveExaminationUpdateRequest,
+)
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from models import ComprehensiveExamination
-from schemas.comprehensive_examination.comprehensive_examination_update_schema import \
-    ComprehensiveExaminationUpdateRequest
 
 
 class ComprehensiveExaminationRepository:

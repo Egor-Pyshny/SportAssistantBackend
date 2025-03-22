@@ -13,7 +13,9 @@ from schemas.competition.competition_update_request import CompetitionUpdateRequ
 from schemas.competition.competition_view import CompetitionViewSchema
 from schemas.competition_day.competition_day_schema import CompetitionDaySchema
 from schemas.competition_day.competition_day_update_request import CompetitionDayUpdateRequest
-from schemas.competition_result.competition_result_update_request import CompetitionResultUpdateRequest
+from schemas.competition_result.competition_result_update_request import (
+    CompetitionResultUpdateRequest,
+)
 
 competition_router = APIRouter()
 
@@ -29,7 +31,9 @@ async def create_competition(
     await competition_service.create(body, sid)
 
 
-@competition_router.get(path=Urls.competition_list.value, response_model=List[CompetitionViewSchema])
+@competition_router.get(
+    path=Urls.competition_list.value, response_model=List[CompetitionViewSchema]
+)
 async def get_competitions(
     response: Response,
     sid: str | None = Depends(authorized_only),

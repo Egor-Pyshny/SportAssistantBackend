@@ -1,10 +1,9 @@
-from typing import List, Annotated
-
-from fastapi import APIRouter, Response, Depends, Body
-from pydantic import UUID4
+from typing import Annotated, List
 
 from constants.urls import Urls
 from dependencies import authorized_only
+from fastapi import APIRouter, Body, Depends, Response
+from pydantic import UUID4
 from routers.med_examination.med_examination_service import MedExaminationService
 from schemas.med_examination.med_examination_create_schema import MedExaminationCreateRequest
 from schemas.med_examination.med_examination_schema import MedExaminationSchema
@@ -25,7 +24,9 @@ async def create_med_exam_result(
     await med_exams_service.create(body, sid)
 
 
-@med_exams_router.get(path=Urls.med_examination_list.value, response_model=List[MedExaminationViewSchema])
+@med_exams_router.get(
+    path=Urls.med_examination_list.value, response_model=List[MedExaminationViewSchema]
+)
 async def get_all(
     response: Response,
     sid: str | None = Depends(authorized_only),
@@ -67,4 +68,3 @@ async def update_med_exam_result(
 ):
     response.set_cookie("sid", sid, httponly=True)
     return await med_exams_service.update(body, exam_id)
-

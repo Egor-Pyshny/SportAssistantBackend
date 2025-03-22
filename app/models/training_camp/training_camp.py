@@ -6,7 +6,6 @@ from sqlalchemy import UUID, Column, Date, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
 
-
 class TrainingCamp(Base, TimeStampableModel):
     __tablename__ = "tbl_training_camp"
 

@@ -1,11 +1,8 @@
-import datetime
-
+from models import Note
 from pydantic import UUID4
+from schemas.note.note_update_request import NoteUpdateRequest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from models import Note
-from schemas.note.note_update_request import NoteUpdateRequest
 
 
 class NotesRepository:

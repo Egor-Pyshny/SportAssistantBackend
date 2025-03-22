@@ -1,12 +1,11 @@
 from datetime import date
 from typing import Annotated, List
 
-from fastapi import APIRouter, Response, Body, Path, Query, Depends
-from pydantic import UUID4
-
 from constants.status_enum import CompetitionStatus
 from constants.urls import Urls
 from dependencies import authorized_only
+from fastapi import APIRouter, Body, Depends, Path, Query, Response
+from pydantic import UUID4
 from routers.training_camp.training_camp_service import TrainingCampService
 from schemas.training_camp.training_camp_create_request import TrainingCampCreateRequest
 from schemas.training_camp.training_camp_schema import TrainingCampSchema
@@ -40,7 +39,9 @@ async def get_camps(
     return await camp_service.get_all(sid=sid, current_date=current_date, status=status)
 
 
-@training_camp_router.get(path=Urls.competition_days.value, response_model=List[TrainingCampDaySchema])
+@training_camp_router.get(
+    path=Urls.competition_days.value, response_model=List[TrainingCampDaySchema]
+)
 async def get_camp_days(
     response: Response,
     competition_id: UUID4,
