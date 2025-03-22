@@ -35,7 +35,7 @@ class TrainingCampService:
     async def create(self, data: TrainingCampCreateRequest, sid: str):
         dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
         user = RedisSessionData(**dict)
-        camp = await self.camp_repository.create(TrainingCamp(**data.model_dump(), user_id=user.id))
+        await self.camp_repository.create(TrainingCamp(**data.model_dump(), user_id=user.id))
 
     async def get_all(self, sid: str, current_date: date, status: CompetitionStatus):
         dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
