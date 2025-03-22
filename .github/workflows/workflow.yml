@@ -32,8 +32,8 @@ jobs:
           pip install --upgrade pip
           pip install poetry
           poetry install --no-interaction --no-root
-        working-directory: ./backend
+        working-directory: .
 
       - name: Start linters.
         run: task code-lint
-        working-directory: ./backend
+        working-directory: .
