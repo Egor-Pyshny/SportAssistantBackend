@@ -7,7 +7,7 @@ class Prefixes(Enum):
 
     auth = f"{api_prefix}/auth"
     user = f"{api_prefix}/user"
-    coach = f"{api_prefix}/coach"
+    coach = f"{api_prefix}/coaches"
     competition = f"{api_prefix}/competition"
     camps = f"{api_prefix}/camps"
     ofp_results = f"{api_prefix}/ofp"

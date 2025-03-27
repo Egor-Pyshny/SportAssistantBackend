@@ -62,24 +62,24 @@ class AuthService:
         return session_id
 
     async def registration(self, request: RegistrationRequest):
-        # existing_user_redis = self.redis_client.exists(
-        #     f"{Prefixes.redis_email_code_prefix.value}:{request.email}"
-        # )
-        # if existing_user_redis:
-        #     raise HTTPException(
-        #         detail={"message": "Email at the verification stage"},
-        #         status_code=status.HTTP_409_CONFLICT,
-        #     )
-        # if await self.user_repository.is_unique_email(email=request.email):
-        #     raise HTTPException(
-        #         detail={"message": "Email already taken"},
-        #         status_code=status.HTTP_409_CONFLICT,
-        #     )
-        # if await self.user_repository.is_unique_name(user_name=request.name):
-        #     raise HTTPException(
-        #         detail={"message": "Username already taken"},
-        #         status_code=status.HTTP_409_CONFLICT,
-        #     )
+        existing_user_redis = self.redis_client.exists(
+            f"{Prefixes.redis_email_code_prefix.value}:{request.email}"
+        )
+        if existing_user_redis:
+            redis_user = self.redis_client.get(f"{Prefixes.redis_email_code_prefix.value}:{request.email}")
+            user = UserWithEmailCodeSchema.from_redis(redis_user)
+            if user.device_id != request.device_id:
+                raise HTTPException(
+                    detail={"message": "Email at the verification stage"},
+                    status_code=status.HTTP_409_CONFLICT,
+                )
+            else:
+                self.redis_client.delete(f"{Prefixes.redis_email_code_prefix.value}:{request.email}")
+        if await self.user_repository.is_unique_email(email=request.email):
+            raise HTTPException(
+                detail={"message": "Email already taken"},
+                status_code=status.HTTP_409_CONFLICT,
+            )
         rounds = int(os.getenv("HASH_ROUNDS", 535000))
         password_hash = sha256_crypt.hash(
             request.password,
@@ -93,30 +93,30 @@ class AuthService:
             created_at=datetime.now(),
             updated_at=datetime.now(),
         )
-        db_user = User(**user.model_dump())
-        await self.user_repository.create_user(db_user)
-        session_id = generate_sid()
-        redis_data = RedisSessionData(
-            email=user.email,
-            id=user.id,
+        code = generate_email_code()
+        user_with_code = UserWithEmailCodeSchema(
+            user=user,
+            email_code=code,
+            device_id=request.device_id
         )
         self.redis_client.set(
-            f"{Prefixes.redis_session_prefix.value}:{session_id}",
-            redis_data.model_dump(mode="json"),
+            f"{Prefixes.redis_email_code_prefix.value}:{user.email}",
+            user_with_code.to_redis(),
+            TTL.email_code_ttl.value,
         )
-        return session_id
-
-        # code = generate_email_code()
-        # user_with_code = UserWithEmailCodeSchema(
-        #     user=user,
-        #     email_code=code,
+        # self.mail_client.send_email(request.email, "Verification code", code)
+        # db_user = User(**user.model_dump())
+        # await self.user_repository.create_user(db_user)
+        # session_id = generate_sid()
+        # redis_data = RedisSessionData(
+        #     email=user.email,
+        #     id=user.id,
         # )
         # self.redis_client.set(
-        #     f"{Prefixes.redis_email_code_prefix.value}:{user.email}",
-        #     user_with_code.to_redis(),
-        #     TTL.email_code_ttl.value,
+        #     f"{Prefixes.redis_session_prefix.value}:{session_id}",
+        #     redis_data.model_dump(mode="json"),
         # )
-        # self.mail_client.send_email(request.email, "Verification code", code)
+        # return session_id
 
     async def verify_email(self, request: EmailValidationRequest) -> str:
         user_json = self.redis_client.get(

@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException
 from pydantic import EmailStr
 from repositories.user.user_repository import UserRepository
 from schemas.auth.redis_session_data import RedisSessionData
+from schemas.user.set_profile_info_request import SetProfileInfoRequest
 from schemas.user.user_response_schema import UserResponseSchema
 from services.redis import RedisClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,3 +35,14 @@ class UserService:
                 detail={"message": "Email already taken"},
                 status_code=status.HTTP_409_CONFLICT,
             )
+
+    async def set_info(self, sid: str, request: SetProfileInfoRequest):
+        dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
+        data = RedisSessionData(**dict)
+        await self.user_repository.fill_data(data.id, request)
+
+    async def is_profile_filled(self, sid: str):
+        dict = self.redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}")
+        data = RedisSessionData(**dict)
+        user = await self.user_repository.get_user_by_id(data.id)
+        return user.is_info_filled

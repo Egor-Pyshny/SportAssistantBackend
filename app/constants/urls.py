@@ -15,6 +15,8 @@ class Urls(Enum):
     # user
     get_me = "/get_me"
     check_email = "/check_email"
+    set_info = "/set_profile_info"
+    is_profile_filled = "/is_profile_filled"
 
     # competition
     competition_list = "/"
