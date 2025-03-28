@@ -11,6 +11,8 @@ class Urls(Enum):
     resend_verification_code = "/resend_verification_code"
     forgot_password = "/forgot_password"
     reset_password = "/reset_password"
+    check_verification_code = "/check_verification_code"
+    resend_password_code = "/resend_password_code"
 
     # user
     get_me = "/get_me"

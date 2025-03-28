@@ -89,6 +89,26 @@ async def forgot_password(
     await auth_service.forgot_password(body)
 
 
+@auth_router.post(path=Urls.resend_password_code.value, responses=resend_code_responses)
+@limiter.limit("1/minute")
+async def resend_password_code(
+    request: Request,
+    body: Annotated[ResendRequest, Body()],
+    auth_service: AuthService = Depends(AuthService),
+):
+    await auth_service.resend_password_code(body)
+
+
+@auth_router.post(path=Urls.check_verification_code.value, responses=forgot_password_responses)
+@limiter.limit("10/minute")
+async def check_verification_code(
+    request: Request,
+    body: Annotated[EmailValidationRequest, Body()],
+    auth_service: AuthService = Depends(AuthService),
+):
+    await auth_service.check_password_code(body)
+
+
 @auth_router.post(path=Urls.reset_password.value, responses=reset_password_responses)
 async def reset_password(
     request: Request,

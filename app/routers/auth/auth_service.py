@@ -174,59 +174,52 @@ class AuthService:
         self.mail_client.send_email(request.email, "Verification code", new_code)
 
     async def forgot_password(self, request: ForgotPasswordRequest):
-        user = await self.user_repository.get_user_by_email(request.email)
-        if not user:
+        new_code = generate_email_code()
+        user = self.user_repository.get_user_by_email(request.email)
+        if user:
+            self.redis_client.set(
+                f"{Prefixes.redis_reset_password_code_prefix.value}:{request.email}",
+                RedisResetPasswordData(code=new_code).model_dump(),
+                TTL.reset_password_code_ttl.value,
+            )
+            self.mail_client.send_email(request.email, "Reset password", new_code)
+
+    async def check_password_code(self, request: EmailValidationRequest):
+        code = self.redis_client.get(
+            f"{Prefixes.redis_reset_password_code_prefix.value}:{request.email}",
+        )
+        if code["code"] != request.code:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={"message": "Incorrect code"},
+            )
+        self.redis_client.delete(f"{Prefixes.redis_reset_password_code_prefix.value}:{request.email}")
+
+    async def reset_password(self, request: ResetPasswordRequest):
+        rounds = int(os.getenv("HASH_ROUNDS", 535000))
+        password_hash = sha256_crypt.hash(
+            request.password,
+            rounds=rounds,
+        )
+        new_password = password_hash.replace(f"rounds={rounds}", "rounds=")
+        success = await self.user_repository.change_user_password(request.email, new_password)
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail={"message": "Something went wrong..."},
+            )
+
+    async def resend_password_code(self, body: ResendRequest):
+        data = self.redis_client.get(f"{Prefixes.redis_reset_password_code_prefix.value}:{body.email}")
+        if not data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail={"message": "User not found"},
+                detail={"message": "User not in verification stage"},
             )
         new_code = generate_email_code()
         self.redis_client.set(
-            f"{Prefixes.redis_reset_password_code_prefix.value}:{user.email}",
+            f"{Prefixes.redis_reset_password_code_prefix.value}:{body.email}",
             RedisResetPasswordData(code=new_code).model_dump(),
             TTL.reset_password_code_ttl.value,
         )
-        self.mail_client.send_email(request.email, "Reset password", new_code)
-
-    async def reset_password(self, request: ResetPasswordRequest):
-        user = await self.user_repository.get_user_by_email(request.email)
-        existing_user_redis = self.redis_client.exists(
-            f"{Prefixes.redis_reset_password_code_prefix.value}:{request.email}"
-        )
-        if not user or not existing_user_redis:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={"message": "User not found"},
-            )
-        code_json = self.redis_client.get(
-            f"{Prefixes.redis_reset_password_code_prefix.value}:{request.email}"
-        )
-
-        if not code_json or not code_json["code"]:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={"message": "User not found"},
-            )
-
-        code = RedisResetPasswordData(code=code_json["code"])
-        if code.code == request.code:
-            rounds = int(os.getenv("HASH_ROUNDS", 535000))
-            password_hash = sha256_crypt.hash(
-                request.password,
-                rounds=rounds,
-            )
-            new_password = password_hash.replace(f"rounds={rounds}", "rounds=")
-            success = await self.user_repository.change_user_password(user.email, new_password)
-            if not success:
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail={"message": "Something went wrong..."},
-                )
-            self.redis_client.delete(
-                f"{Prefixes.redis_reset_password_code_prefix.value}:{request.email}"
-            )
-        else:
-            raise HTTPException(
-                detail={"message": "Wrong code"},
-                status_code=status.HTTP_400_BAD_REQUEST,
-            )
+        self.mail_client.send_email(body.email, "Verification code", new_code)
