@@ -1,6 +1,4 @@
-import re
-
-from pydantic import UUID4, BaseModel, EmailStr, field_validator
+from pydantic import UUID4, BaseModel
 
 
 class SetProfileInfoRequest(BaseModel):

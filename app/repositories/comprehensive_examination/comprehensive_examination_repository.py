@@ -1,9 +1,11 @@
+from datetime import date
+
 from models import ComprehensiveExamination
 from pydantic import UUID4
 from schemas.comprehensive_examination.comprehensive_examination_update_schema import (
     ComprehensiveExaminationUpdateRequest,
 )
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -53,3 +55,16 @@ class ComprehensiveExaminationRepository:
         query = select(ComprehensiveExamination).where(ComprehensiveExamination.id == exam_id)
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
+
+    async def get_examinations_between_dates(
+        self, user_id: UUID4, start_month: date, end_month: date
+    ):
+        query = select(ComprehensiveExamination).where(
+            and_(
+                ComprehensiveExamination.user_id == user_id,
+                ComprehensiveExamination.date >= start_month,
+                ComprehensiveExamination.date <= end_month,
+            )
+        )
+        result = await self.db.execute(query)
+        return list(result.scalars().all())

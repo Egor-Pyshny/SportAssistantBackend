@@ -95,3 +95,6 @@ class Urls(Enum):
     coach_list = "/"
     coach_detail = "/{coach_id}"
     coach_create = "/create"
+
+    # calendar
+    calendar_get = "/"

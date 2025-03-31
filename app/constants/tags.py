@@ -12,4 +12,5 @@ class Tags(Enum):
     ant_params = ["anthropometric_params"]
     notes = ["notes"]
     med_examination = ["med_examination"]
+    calendar = ["calendar"]
     comprehensive_examination = ["comprehensive_examination"]

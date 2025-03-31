@@ -19,7 +19,9 @@ class RegistrationRequest(BaseModel):
         if not re.match(pattern, value):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail={"message": "Password must contain at least one special character, one digit and one letter"},
+                detail={
+                    "message": "Password must contain at least one special character, one digit and one letter"
+                },
             )
 
         if len(value) < 8:

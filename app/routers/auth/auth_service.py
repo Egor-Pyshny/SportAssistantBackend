@@ -66,7 +66,9 @@ class AuthService:
             f"{Prefixes.redis_email_code_prefix.value}:{request.email}"
         )
         if existing_user_redis:
-            redis_user = self.redis_client.get(f"{Prefixes.redis_email_code_prefix.value}:{request.email}")
+            redis_user = self.redis_client.get(
+                f"{Prefixes.redis_email_code_prefix.value}:{request.email}"
+            )
             user = UserWithEmailCodeSchema.from_redis(redis_user)
             if user.device_id != request.device_id:
                 raise HTTPException(
@@ -74,7 +76,9 @@ class AuthService:
                     status_code=status.HTTP_409_CONFLICT,
                 )
             else:
-                self.redis_client.delete(f"{Prefixes.redis_email_code_prefix.value}:{request.email}")
+                self.redis_client.delete(
+                    f"{Prefixes.redis_email_code_prefix.value}:{request.email}"
+                )
         if await self.user_repository.is_unique_email(email=request.email):
             raise HTTPException(
                 detail={"message": "Email already taken"},
@@ -95,9 +99,7 @@ class AuthService:
         )
         code = generate_email_code()
         user_with_code = UserWithEmailCodeSchema(
-            user=user,
-            email_code=code,
-            device_id=request.device_id
+            user=user, email_code=code, device_id=request.device_id
         )
         self.redis_client.set(
             f"{Prefixes.redis_email_code_prefix.value}:{user.email}",
@@ -193,7 +195,9 @@ class AuthService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={"message": "Incorrect code"},
             )
-        self.redis_client.delete(f"{Prefixes.redis_reset_password_code_prefix.value}:{request.email}")
+        self.redis_client.delete(
+            f"{Prefixes.redis_reset_password_code_prefix.value}:{request.email}"
+        )
 
     async def reset_password(self, request: ResetPasswordRequest):
         rounds = int(os.getenv("HASH_ROUNDS", 535000))
@@ -210,7 +214,9 @@ class AuthService:
             )
 
     async def resend_password_code(self, body: ResendRequest):
-        data = self.redis_client.get(f"{Prefixes.redis_reset_password_code_prefix.value}:{body.email}")
+        data = self.redis_client.get(
+            f"{Prefixes.redis_reset_password_code_prefix.value}:{body.email}"
+        )
         if not data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

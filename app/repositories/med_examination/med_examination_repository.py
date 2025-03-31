@@ -1,7 +1,9 @@
+from datetime import date
+
 from models import MedExamination
 from pydantic import UUID4
 from schemas.med_examination.med_examination_update_schema import MedExaminationUpdateRequest
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -50,3 +52,16 @@ class MedExaminationRepository:
         query = select(MedExamination).where(MedExamination.id == exam_id)
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
+
+    async def get_examinations_between_dates(
+        self, user_id: UUID4, start_month: date, end_month: date
+    ):
+        query = select(MedExamination).where(
+            and_(
+                MedExamination.user_id == user_id,
+                MedExamination.date >= start_month,
+                MedExamination.date <= end_month,
+            )
+        )
+        result = await self.db.execute(query)
+        return list(result.scalars().all())

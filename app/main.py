@@ -13,6 +13,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.params import Depends
 from routers.ant_params.ant_params_controller import ant_params_router
 from routers.auth.auth_controller import auth_router
+from routers.calendar.calendar_controller import calendar_router
 from routers.coach.coach_controller import coach_router
 from routers.competition.competition_controller import competition_router
 from routers.comprehensive_examination.comprehensive_examination_controller import (
@@ -81,6 +82,7 @@ app.include_router(
 app.include_router(
     med_exams_router, prefix=Prefixes.med_examination.value, tags=Tags.med_examination.value
 )
+app.include_router(calendar_router, prefix=Prefixes.calendar.value, tags=Tags.calendar.value)
 
 
 @app.get("/health_check", status_code=200)

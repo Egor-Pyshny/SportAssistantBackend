@@ -91,3 +91,14 @@ class TrainingCampRepository:
             await self.db.commit()
             return True
         return False
+
+    async def get_camps_between_dates(self, user_id: UUID4, start_month: date, end_month: date):
+        query = select(TrainingCamp).where(
+            and_(
+                TrainingCamp.user_id == user_id,
+                TrainingCamp.start_date >= start_month,
+                TrainingCamp.start_date <= end_month,
+            )
+        )
+        result = await self.db.execute(query)
+        return list(result.scalars().all())

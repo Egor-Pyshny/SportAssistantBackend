@@ -1,7 +1,9 @@
+from datetime import date
+
 from models import Note
 from pydantic import UUID4
 from schemas.note.note_update_request import NoteUpdateRequest
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -47,3 +49,24 @@ class NotesRepository:
         query = select(Note).where(Note.id == note_id)
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
+
+    async def get_by_date(self, user_id: UUID4, current_date: date):
+        query = select(Note).where(
+            and_(
+                Note.user_id == user_id,
+                Note.date == current_date,
+            )
+        )
+        result = await self.db.execute(query)
+        return result.scalar_one_or_none()
+
+    async def get_notes_between_dates(self, user_id: UUID4, start_month: date, end_month: date):
+        query = select(Note).where(
+            and_(
+                Note.user_id == user_id,
+                Note.date >= start_month,
+                Note.date <= end_month,
+            )
+        )
+        result = await self.db.execute(query)
+        return list(result.scalars().all())

@@ -15,6 +15,7 @@ class Prefixes(Enum):
     ant_params = f"{api_prefix}/anthropometric_params"
     notes = f"{api_prefix}/notes"
     med_examination = f"{api_prefix}/med_examination"
+    calendar = f"{api_prefix}/calendar"
     comprehensive_examination = f"{api_prefix}/comprehensive_examination"
 
     redis_session_prefix = "sessions"

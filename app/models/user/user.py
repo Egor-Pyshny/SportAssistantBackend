@@ -3,7 +3,7 @@ from uuid import uuid4
 from constants.roles import Roles
 from models import Base
 from models.general.timestampable_model import TimeStampableModel
-from sqlalchemy import UUID, Column, ForeignKey, String, Text, null, Boolean
+from sqlalchemy import UUID, Boolean, Column, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
 

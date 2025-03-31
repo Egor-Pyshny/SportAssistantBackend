@@ -83,3 +83,20 @@ class OFPResultsRepository:
         )
         result = await self.db.execute(query)
         return list(result.scalars().all())
+
+    async def get_examinations_between_dates(
+        self, user_id: UUID4, start_month: date, end_month: date
+    ):
+        query = (
+            select(OFPResults)
+            .options(subqueryload(OFPResults.ofp_category))
+            .where(
+                and_(
+                    OFPResults.user_id == user_id,
+                    OFPResults.date >= start_month,
+                    OFPResults.date <= end_month,
+                )
+            )
+        )
+        result = await self.db.execute(query)
+        return list(result.scalars().all())

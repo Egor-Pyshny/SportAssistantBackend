@@ -95,3 +95,16 @@ class CompetitionRepository:
             await self.db.commit()
             return True
         return False
+
+    async def get_competitions_between_dates(
+        self, user_id: UUID4, start_month: date, end_month: date
+    ):
+        query = select(Competition).where(
+            and_(
+                Competition.user_id == user_id,
+                Competition.start_date >= start_month,
+                Competition.start_date <= end_month,
+            )
+        )
+        result = await self.db.execute(query)
+        return list(result.scalars().all())

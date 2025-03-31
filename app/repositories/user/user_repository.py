@@ -1,10 +1,9 @@
 from models import User
 from pydantic import EmailStr
+from schemas.user.set_profile_info_request import SetProfileInfoRequest
 from sqlalchemy import UUID, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import subqueryload
-
-from schemas.user.set_profile_info_request import SetProfileInfoRequest
 
 
 class UserRepository:
@@ -53,14 +52,18 @@ class UserRepository:
         return result.rowcount > 0
 
     async def fill_data(self, user_id: UUID, data: SetProfileInfoRequest):
-        query = update(User).where(User.id == user_id).values(
-            sport_type=data.sport_type,
-            qualification=data.qualification,
-            address=data.qualification,
-            phone_number=data.phone_number,
-            sex=data.sex,
-            coach_id=data.coach_id,
-            is_info_filled=True,
+        query = (
+            update(User)
+            .where(User.id == user_id)
+            .values(
+                sport_type=data.sport_type,
+                qualification=data.qualification,
+                address=data.qualification,
+                phone_number=data.phone_number,
+                sex=data.sex,
+                coach_id=data.coach_id,
+                is_info_filled=True,
+            )
         )
-        result = await self.db.execute(query)
+        await self.db.execute(query)
         await self.db.commit()

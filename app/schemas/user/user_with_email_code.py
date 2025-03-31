@@ -1,5 +1,4 @@
-from pydantic import BaseModel, UUID4
-
+from pydantic import UUID4, BaseModel
 from schemas.user.user_schema import UserSchema
 
 
