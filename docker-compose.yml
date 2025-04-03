@@ -5,7 +5,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: takumi
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    container_name: SportAssistantBackend
     volumes:
       - ./app:/backend/app
       - ./scripts/start.sh:/start.sh
@@ -41,23 +45,5 @@ services:
       - REDIS_USER=redis
     ports:
       - 6379:6379
-    
-  celery_worker:
-      build:
-        context: .
-        dockerfile: Dockerfile
-      container_name: celery_worker
-      command: >
-        sh -c "PYTHONPATH=/backend/app celery -A app.services.celery_app.task worker --loglevel=info"
-      depends_on:
-        - backend
-        - redis
-      env_file:
-        - .env
-      volumes:
-        - ./app:/backend/app
-      environment:
-        - PYTHONPATH=/backend/app
-
 volumes:
   db-data:

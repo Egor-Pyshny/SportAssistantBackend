@@ -15,20 +15,6 @@ class MailSender(ABC):
         pass
 
 
-class SendGridClient(MailSender):
-
-    def send_email(self, to_email: EmailStr, subject: str, content: str):
-        message = Mail(
-            from_email=os.getenv("SENDGRID_FROM_EMAIL"),
-            to_emails=to_email,
-            subject=subject,
-            html_content=content,
-        )
-        sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
-        response = sg.send(message)
-        return response.status_code
-
-
 class SMTPClient(MailSender):
 
     def send_email(self, to_email: str | EmailStr, subject: str, content: str):

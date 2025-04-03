@@ -22,7 +22,7 @@ section = config.config_ini_section
 config.set_section_option(
     section,
     "DB_URL",
-    os.getenv("ASYNC_DATABASE_URL", "postgresql://postgres:admin@localhost/a"),
+    os.getenv("ASYNC_DATABASE_URL", None),
 )
 
 if config.config_file_name is not None:
