@@ -42,6 +42,11 @@ class AuthService:
 
     async def login(self, request: LoginRequest) -> str:
         user = await self.user_repository.get_user_by_email(request.email)
+        if not user:
+            raise HTTPException(
+                detail={"message": "Wrong email or password"},
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
         password_hash = user.password.replace(
             "rounds=", f"rounds={int(os.getenv('HASH_ROUNDS', 535000))}"
         )

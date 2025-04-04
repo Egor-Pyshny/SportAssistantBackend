@@ -22,7 +22,7 @@ def authorized_only(sid: Annotated[str | None, Cookie()] = None):
     redis_client = get_redis_client()
     data = redis_client.get(f"{Prefixes.redis_session_prefix.value}:{sid}") if sid else None
     if not sid or not data:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail={"message": "Forbidden"})
     new_sid = generate_sid()
     redis_client.set(f"{Prefixes.redis_session_prefix.value}:{new_sid}", data)
     redis_client.delete(f"{Prefixes.redis_session_prefix.value}:{sid}")
