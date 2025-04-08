@@ -103,6 +103,7 @@ class AuthService:
             updated_at=datetime.now(),
         )
         code = generate_email_code()
+        self.mail_client.send_email(request.email, "Verification code", code)
         user_with_code = UserWithEmailCodeSchema(
             user=user, email_code=code, device_id=request.device_id
         )
