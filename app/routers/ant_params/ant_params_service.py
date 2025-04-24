@@ -99,11 +99,11 @@ class AnthropometricParamsService:
                     )
                     for param in dataList
                 ]
-            case AnthropometricParamsMeasures.chest_circumference:
+            case AnthropometricParamsMeasures.chestCircumference:
                 return lambda dataList: [
                     GraphicPoint(
                         key=param.date,
-                        value=param.chestCircumference,
+                        value=param.chest_circumference,
                     )
                     for param in dataList
                 ]
